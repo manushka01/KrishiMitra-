@@ -1,5 +1,5 @@
 # 🌾 KrishiMitra AI – Predictive Farming Intelligence System
-### Smart India Hackathon (SIH) Final Round Project
+### Major Final Year Project
 
 ---
 
