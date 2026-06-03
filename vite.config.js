@@ -14,7 +14,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => '/openai/v1/chat/completions',
         headers: {
-          'Authorization': 'Bearer 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',
+          'Authorization': '',
         },
       },
       // Weather API proxy
