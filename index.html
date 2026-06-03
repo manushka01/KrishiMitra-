@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>KrishiMitra AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans Devanagari',sans-serif;background:#f0fdf4;min-height:100vh;overflow-x:hidden}
+:root{--green:#16a34a;--dark:#14532d;--light:#d1fae5;--warn:#f59e0b;--red:#ef4444;--blue:#3b82f6}
+.app{max-width:430px;margin:0 auto;min-height:100vh;position:relative;background:#f0fdf4}
+.header{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#14532d,#16a34a);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.15)}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-text p{color:white;font-weight:700;font-size:14px;line-height:1}
+.logo-text small{color:#bbf7d0;font-size:11px}
+.weather-badge{background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 10px;color:white;font-size:11px;cursor:pointer}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:white;border-top:1px solid #e5e7eb;display:flex;z-index:50}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;border:none;background:none;cursor:pointer;transition:all 0.2s;color:#9ca3af}
+.nav-btn.active{color:#16a34a}
+.nav-btn.active .nav-icon{transform:scale(1.1)}
+.nav-icon{font-size:22px;transition:transform 0.2s}
+.nav-label{font-size:10px;font-weight:600}
+.dot{width:5px;height:5px;border-radius:50%;background:#16a34a;opacity:0}
+.nav-btn.active .dot{opacity:1}
+.main{padding:12px 14px;padding-bottom:80px}
+.card{background:white;border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:12px}
+.card-green{background:linear-gradient(135deg,#1a472a,#2d6a4f);color:white}
+.weather-main{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.weather-temp{font-size:52px;font-weight:700;color:white;line-height:1}
+.weather-info{background:rgba(255,255,255,0.12);border-radius:14px;padding:12px;text-align:right}
+.weather-label{color:rgba(255,255,255,0.6);font-size:11px}
+.weather-val{color:white;font-weight:700;font-size:16px}
+.risk-box{background:rgba(255,255,255,0.12);border-radius:12px;padding:10px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.forecast{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.forecast-day{background:rgba(255,255,255,0.12);border-radius:10px;padding:8px 4px;text-align:center}
+.forecast-day p{color:rgba(255,255,255,0.7);font-size:10px}
+.forecast-day .icon{font-size:18px;margin:2px 0}
+.forecast-day .temp{color:white;font-size:11px;font-weight:700}
+.forecast-day .rain{color:#93c5fd;font-size:10px}
+.alert-banner{border-radius:14px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;transition:all 0.4s}
+.progress-row{margin-bottom:12px}
+.progress-header{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.progress-label{color:#6b7280}
+.progress-val{color:#1f2937;font-weight:600}
+.progress-bar{background:#f3f4f6;border-radius:99px;height:8px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;transition:width 1.5s ease}
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:12px;border-left:4px solid;margin-bottom:8px}
+.alert-icon{font-size:18px}
+.alert-title{font-size:13px;font-weight:600}
+.alert-desc{font-size:11px;color:#6b7280;margin-top:2px}
+.profile-card{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.avatar{width:48px;height:48px;border-radius:50%;background:#d1fae5;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.profile-name{font-weight:700;color:#1f2937;font-size:15px}
+.profile-loc{color:#6b7280;font-size:12px}
+.edit-btn{margin-left:auto;font-size:12px;color:#16a34a;font-weight:600;border:1px solid #bbf7d0;padding:4px 10px;border-radius:8px;background:none;cursor:pointer}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-box{border-radius:12px;padding:10px;text-align:center}
+.stat-icon{font-size:20px}
+.stat-label{font-size:10px;color:#6b7280;margin:2px 0}
+.stat-val{font-size:12px;font-weight:700;color:#1f2937}
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 160px)}
+.chat-messages{flex:1;overflow-y:auto;padding-bottom:8px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;align-items:flex-end;gap:8px}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:50%;background:#d1fae5;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.msg-bubble{max-width:78%;padding:12px 16px;border-radius:18px;font-size:13px;line-height:1.6}
+.msg.bot .msg-bubble{background:white;color:#374151;border-radius:4px 18px 18px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.msg.user .msg-bubble{background:#16a34a;color:white;border-radius:18px 4px 18px 18px}
+.typing{display:flex;gap:4px;align-items:center}
+.typing-dot{width:8px;height:8px;border-radius:50%;background:#16a34a;animation:bounce 1.4s infinite}
+.typing-dot:nth-child(2){animation-delay:0.15s}
+.typing-dot:nth-child(3){animation-delay:0.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.suggestions{display:flex;gap:8px;overflow-x:auto;padding:8px 0;scrollbar-width:none}
+.suggestions::-webkit-scrollbar{display:none}
+.suggest-btn{flex-shrink:0;font-size:11px;padding:7px 12px;border-radius:99px;border:1px solid #bbf7d0;color:#16a34a;background:#f0fdf4;cursor:pointer;white-space:nowrap;font-family:inherit}
+.suggest-btn:hover{background:#dcfce7}
+.chat-input-row{display:flex;gap:8px;padding-top:8px}
+.voice-btn{width:48px;height:48px;border-radius:14px;border:2px solid #bbf7d0;background:#f0fdf4;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.voice-btn.listening{background:#fef2f2;border-color:#ef4444;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.chat-input{flex:1;border:1px solid #e5e7eb;border-radius:14px;padding:12px 14px;font-size:13px;font-family:inherit;outline:none;transition:border 0.2s}
+.chat-input:focus{border-color:#16a34a}
+.send-btn{width:48px;height:48px;border-radius:14px;background:#16a34a;border:none;color:white;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.upload-zone{border:2px dashed #d1d5db;border-radius:18px;padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;background:#f9fafb}
+.upload-zone.has-img{border-color:#16a34a;background:#f0fdf4}
+.upload-zone:hover{border-color:#86efac}
+.upload-img{width:100%;max-height:200px;object-fit:contain;border-radius:12px}
+.upload-actions{display:flex;gap:8px;margin-top:12px}
+.btn{border:none;border-radius:14px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;width:100%}
+.btn-outline{background:white;border:1px solid #e5e7eb;color:#6b7280}
+.btn-primary{background:#16a34a;color:white}
+.btn-primary:disabled{background:#86efac;cursor:not-allowed}
+.confidence-bar{background:#f3f4f6;border-radius:99px;height:6px;overflow:hidden;margin-top:4px}
+.treatment-box{background:#f0fdf4;border-radius:10px;padding:10px;margin-top:8px}
+.treatment-label{font-size:11px;font-weight:700;color:#15803d}
+.treatment-text{font-size:12px;color:#166534;margin-top:2px}
+.select-row{margin-bottom:12px}
+.select-label{font-size:13px;color:#6b7280;margin-bottom:4px;display:block}
+select,input[type=range]{width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;background:white}
+select:focus{border-color:#16a34a}
+input[type=range]{padding:6px 0;border:none;accent-color:#16a34a}
+.range-labels{display:flex;justify-content:space-between;font-size:11px;color:#9ca3af;margin-top:2px}
+.crop-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.crop-card{border-radius:18px;padding:14px;position:relative;overflow:hidden}
+.crop-card.winner{background:linear-gradient(135deg,#16a34a,#15803d);color:white}
+.crop-card.loser{background:white;border:2px solid #e5e7eb}
+.winner-badge{position:absolute;top:8px;right:8px;background:#fbbf24;color:#78350f;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.crop-card-name{font-weight:700;font-size:13px;margin-bottom:10px}
+.crop-stat{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
+.crop-card.winner .crop-stat{border-color:rgba(255,255,255,0.15)}
+.crop-key{color:#9ca3af}
+.crop-card.winner .crop-key{color:#bbf7d0}
+.crop-val{font-weight:600;color:#1f2937}
+.crop-card.winner .crop-val{color:white}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th{background:#f0fdf4;color:#6b7280;padding:8px;text-align:left}
+.table th:not(:first-child){text-align:right}
+.table td{padding:8px;border-bottom:1px solid #f3f4f6}
+.table td:not(:first-child){text-align:right}
+.table .bold-row td{font-weight:700;color:#15803d}
+.scheme-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f3f4f6}
+.scheme-row:last-child{border:none}
+.badge{font-size:11px;padding:3px 8px;border-radius:99px;font-weight:600}
+.tip-banner{background:linear-gradient(135deg,#16a34a,#15803d);border-radius:18px;padding:16px;color:white;margin-bottom:12px}
+.tip-title{font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.tip-text{font-size:13px;color:#bbf7d0;line-height:1.6}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:white;border-radius:20px;padding:20px;width:100%;max-width:360px}
+.modal-title{font-weight:700;font-size:16px;color:#1f2937;margin-bottom:16px}
+.form-group{margin-bottom:12px}
+.form-label{font-size:12px;color:#6b7280;margin-bottom:4px;display:block}
+.form-input{width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none}
+.form-input:focus{border-color:#16a34a}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+.btn-sm{padding:10px 0;border-radius:12px;font-size:13px;font-weight:600;width:100%;border:none;cursor:pointer;font-family:inherit}
+.section-title{font-weight:700;color:#1f2937;display:flex;align-items:center;gap:8px;font-size:15px;margin-bottom:12px}
+.api-notice{background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:10px;margin-bottom:10px;font-size:11px;color:#92400e;line-height:1.6}
+.api-notice a{color:#b45309;font-weight:700;text-decoration:underline}
+.weather-loading{display:flex;align-items:center;gap:8px;padding:20px;justify-content:center}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{100%{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="header">
+    <div class="logo">
+      <span style="font-size:28px">🌾</span>
+      <div class="logo-text">
+        <p>KrishiMitra AI</p>
+        <small>कृषि बुद्धिमत्ता प्रणाली</small>
+      </div>
+    </div>
+    <div class="weather-badge" id="header-badge" onclick="navigate('dashboard')">📡 लोड हो रहा है...</div>
+  </div>
+  <div class="main" id="main-content"></div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="navigate('dashboard')" id="nav-dashboard">
+      <span class="nav-icon">🏠</span><span class="nav-label">होम</span><span class="dot"></span>
+    </button>
+    <button class="nav-btn" onclick="navigate('chat')" id="nav-chat">
+      <span class="nav-icon">🤖</span><span class="nav-label">AI चैट</span><span class="dot"></span>
+    </button>
+    <button class="nav-btn" onclick="navigate('disease')" id="nav-disease">
+      <span class="nav-icon">📸</span><span class="nav-label">रोग जांच</span><span class="dot"></span>
+    </button>
+    <button class="nav-btn" onclick="navigate('profit')" id="nav-profit">
+      <span class="nav-icon">💰</span><span class="nav-label">लाभ</span><span class="dot"></span>
+    </button>
+  </nav>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// ⚠️ IMPORTANT: Replace with your free API key from openweathermap.org
+const OWM_KEY = '1db1eda37d53e9472097aa1fe4b343a4';
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let currentPage = 'dashboard';
+let farmer = {
+  name: 'रामलाल पटेल',
+  location: 'Kanpur,UP',
+  weatherCity: 'Kanpur',       // ← English city name for weather API
+  crop: 'गेहूं (Wheat)',
+  area: 3,
+  experience: 12
+};
+let weatherData = null;      // stores live weather
+let chatHistory = [];
+let alertIdx = 0;
+
+// ─── CROP DATA ────────────────────────────────────────────────────────────────
+const CROPS = ['गेहूं (Wheat)','धान (Rice)','सोयाबीन (Soybean)','मक्का (Maize)','कपास (Cotton)','गन्ना (Sugarcane)','टमाटर (Tomato)','प्याज (Onion)'];
+const CROP_DATA = {
+  'गेहूं (Wheat)':     {cost:18000,rev:32000,yield:'40 क्विंटल',season:'रबी',risk:'कम'},
+  'धान (Rice)':        {cost:22000,rev:38000,yield:'50 क्विंटल',season:'खरीफ',risk:'मध्यम'},
+  'सोयाबीन (Soybean)': {cost:14000,rev:28000,yield:'25 क्विंटल',season:'खरीफ',risk:'कम'},
+  'मक्का (Maize)':     {cost:16000,rev:30000,yield:'60 क्विंटल',season:'खरीफ',risk:'कम'},
+  'कपास (Cotton)':     {cost:28000,rev:55000,yield:'20 क्विंटल',season:'खरीफ',risk:'उच्च'},
+  'गन्ना (Sugarcane)': {cost:35000,rev:70000,yield:'800 क्विंटल',season:'वर्षभर',risk:'मध्यम'},
+  'टमाटर (Tomato)':    {cost:45000,rev:90000,yield:'300 क्विंटल',season:'रबी',risk:'उच्च'},
+  'प्याज (Onion)':     {cost:30000,rev:60000,yield:'200 क्विंटल',season:'रबी',risk:'उच्च'},
+};
+const MARQUEE = [
+  {icon:'⚠️',text:'कल भारी वर्षा – फसल की सुरक्षा करें',bg:'#fef3c7',color:'#92400e'},
+  {icon:'🌡️',text:'तापमान 30°C से ऊपर – अधिक सिंचाई करें',bg:'#fee2e2',color:'#991b1b'},
+  {icon:'✅',text:'गेहूं की MSP ₹2,275/क्विंटल घोषित',bg:'#d1fae5',color:'#065f46'},
+  {icon:'📢',text:'PM किसान अगली किस्त अगले माह',bg:'#eff6ff',color:'#1e40af'},
+];
+const SUGGESTIONS = [
+  'मेरी फसल में कीट लग रहे हैं?','इस हफ्ते बारिश होगी?','गेहूं की सबसे अच्छी किस्म?',
+  'खाद कब और कितनी डालें?','फसल बीमा कैसे लें?',
+];
+
+// ─── WEATHER HELPERS ─────────────────────────────────────────────────────────
+function conditionHindi(d) {
+  const m = {'clear sky':'साफ आसमान','few clouds':'थोड़े बादल','scattered clouds':'बिखरे बादल',
+    'broken clouds':'टूटे बादल','overcast clouds':'घने बादल','light rain':'हल्की बारिश',
+    'moderate rain':'मध्यम बारिश','heavy intensity rain':'भारी बारिश','thunderstorm':'गरज-चमक',
+    'snow':'बर्फबारी','mist':'धुंध','haze':'धुंध','fog':'कोहरा'};
+  return m[d?.toLowerCase()] || d || 'आंशिक बादल';
+}
+function wIcon(id) {
+  if (!id) return '⛅';
+  if (id >= 200 && id < 300) return '⛈️';
+  if (id >= 300 && id < 400) return '🌦️';
+  if (id >= 500 && id < 600) return '🌧️';
+  if (id >= 600 && id < 700) return '❄️';
+  if (id >= 700 && id < 800) return '🌫️';
+  if (id === 800) return '☀️';
+  if (id > 800) return '⛅';
+  return '🌤️';
+}
+function getRisk(h, t) {
+  if (h > 80 && t > 25) return {level:'उच्च', color:'#ef4444', icon:'🔴'};
+  if (h > 65 && t > 22) return {level:'मध्यम', color:'#f59e0b', icon:'🟡'};
+  return {level:'कम', color:'#10b981', icon:'🟢'};
+}
+
+// ─── WEATHER FETCH (real-time by city) ────────────────────────────────────────
+async function fetchWeather(city) {
+  if (!city) city = farmer.weatherCity || 'Pune';
+
+  // If no API key, use mock data
+  if (!OWM_KEY || OWM_KEY === 'YOUR_OPENWEATHERMAP_KEY_HERE') {
+    weatherData = getMockWeather(city);
+    updateHeaderBadge();
+    return;
+  }
+
+  try {
+    const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${OWM_KEY}&units=metric`);
+    if (!r.ok) throw new Error('City not found or invalid key');
+    const d = await r.json();
+
+    const fr = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${OWM_KEY}&units=metric&cnt=5`);
+    const fd = await fr.json();
+    const days = ['आज','कल','परसों','4 दिन','5 दिन'];
+
+    weatherData = {
+      city: d.name + ', ' + d.sys.country,
+      temp: Math.round(d.main.temp),
+      feelsLike: Math.round(d.main.feels_like),
+      humidity: d.main.humidity,
+      wind: Math.round(d.wind.speed * 3.6),
+      condition: conditionHindi(d.weather?.[0]?.description),
+      icon: wIcon(d.weather?.[0]?.id),
+      rainChance: Math.round(((fd.list?.[0]?.pop) || 0) * 100),
+      forecast: (fd.list || []).slice(0, 5).map((f, i) => ({
+        day: days[i],
+        icon: wIcon(f.weather?.[0]?.id),
+        high: Math.round(f.main.temp_max),
+        low: Math.round(f.main.temp_min),
+        rain: Math.round((f.pop || 0) * 100),
+      })),
+      lastUpdated: new Date().toLocaleTimeString('hi-IN'),
+      isLive: true,
+    };
+  } catch (e) {
+    console.warn('Weather fetch failed:', e.message);
+    weatherData = getMockWeather(city);
+    weatherData.error = e.message;
+  }
+  updateHeaderBadge();
+  if (currentPage === 'dashboard') render();
+}
+
+function getMockWeather(city) {
+  return {
+    city: city + ' (ऑफलाइन)',
+    temp: 28, feelsLike: 30, humidity: 74, wind: 12,
+    condition: 'आंशिक बादल', icon: '⛅', rainChance: 20,
+    forecast: [
+      {day:'आज', icon:'⛅', high:30, low:22, rain:20},
+      {day:'कल', icon:'🌧️', high:26, low:20, rain:75},
+      {day:'परसों', icon:'🌦️', high:27, low:21, rain:55},
+      {day:'शुक्र', icon:'☀️', high:32, low:23, rain:5},
+      {day:'शनि', icon:'☀️', high:33, low:24, rain:0},
+    ],
+    lastUpdated: 'ऑफलाइन',
+    isLive: false,
+  };
+}
+
+function updateHeaderBadge() {
+  const el = document.getElementById('header-badge');
+  if (!el || !weatherData) return;
+  el.textContent = (weatherData.isLive ? '📡 ' : '📶 ') + weatherData.temp + '°C · ' + weatherData.humidity + '%';
+}
+
+// Start weather refresh every 10 minutes
+function startWeatherRefresh() {
+  clearInterval(window._weatherTimer);
+  window._weatherTimer = setInterval(() => fetchWeather(farmer.weatherCity), 10 * 60 * 1000);
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+function navigate(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-' + page).classList.add('active');
+  render();
+}
+
+function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const el = document.getElementById('main-content');
+  if (currentPage === 'dashboard') el.innerHTML = renderDashboard();
+  else if (currentPage === 'chat') { el.innerHTML = renderChat(); initChat(); }
+  else if (currentPage === 'disease') { el.innerHTML = renderDisease(); initDisease(); }
+  else if (currentPage === 'profit') { el.innerHTML = renderProfit(); initProfit(); }
+  startAlertRotation();
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const w = weatherData;
+  const risk = w ? getRisk(w.humidity, w.temp) : {level:'मध्यम',color:'#f59e0b',icon:'🟡'};
+
+  const tempDisplay = w ? w.temp + '°C' : '28°C';
+  const humDisplay = w ? w.humidity + '%' : '74%';
+  const windDisplay = w ? w.wind + ' km/h' : '12 km/h';
+  const condDisplay = w ? w.condition : 'आंशिक बादल';
+  const cityDisplay = w ? w.city : farmer.location;
+  const rainDisplay = w ? w.rainChance + '%🌧' : '20%🌧';
+  const iconDisplay = w ? w.icon : '⛅';
+  const updatedDisplay = w ? w.lastUpdated : '—';
+
+  // Dynamic alerts based on live weather
+  const dynamicAlerts = w ? [
+    w.rainChance > 50
+      ? {icon:'🌧️',title:`${w.rainChance}% बारिश की संभावना`,desc:'कटाई टालें, जल निकासी सुनिश्चित करें',color:'#3b82f6',bg:'#eff6ff'}
+      : {icon:'☀️',title:'मौसम साफ है',desc:'सिंचाई के लिए अच्छा समय',color:'#10b981',bg:'#f0fdf4'},
+    w.humidity > 75
+      ? {icon:'🍄',title:`फफूंद जोखिम उच्च (${w.humidity}%)`,desc:'नीम तेल 5ml/L – तुरंत छिड़काव करें',color:'#ef4444',bg:'#fef2f2'}
+      : {icon:'🍄',title:`फफूंद जोखिम कम (${w.humidity}%)`,desc:'स्थिति सामान्य है',color:'#10b981',bg:'#f0fdf4'},
+    w.temp > 35
+      ? {icon:'🌡️',title:`तापमान बहुत अधिक: ${w.temp}°C`,desc:'सुबह या शाम सिंचाई करें',color:'#f59e0b',bg:'#fffbeb'}
+      : {icon:'🌡️',title:`तापमान: ${w.temp}°C (feels like ${w.feelsLike}°C)`,desc:'मौसम अनुकूल है',color:'#6b7280',bg:'#f9fafb'},
+    {icon:'💨',title:`हवा: ${w.wind} km/h`,desc:w.wind > 30 ? 'तेज हवा – छिड़काव न करें' : 'छिड़काव के लिए ठीक है',color:'#8b5cf6',bg:'#f5f3ff'},
+  ] : [
+    {icon:'🌧️',title:'कल भारी बारिश',desc:'25 mm वर्षा – कटाई टालें',color:'#3b82f6',bg:'#eff6ff'},
+    {icon:'🍄',title:'फफूंद जोखिम उच्च',desc:'नमी 74% – नीम छिड़काव करें',color:'#ef4444',bg:'#fef2f2'},
+    {icon:'🐛',title:'कीट चेतावनी',desc:'टिड्डा गतिविधि दक्षिण क्षेत्र',color:'#f59e0b',bg:'#fffbeb'},
+    {icon:'💧',title:'सिंचाई सुझाव',desc:'2 दिन पानी न दें – बारिश आने वाली',color:'#10b981',bg:'#f0fdf4'},
+  ];
+
+  const aiTip = w
+    ? w.rainChance > 50
+      ? `🌧️ ${cityDisplay} में आज ${w.rainChance}% बारिश की संभावना है। सिंचाई बंद रखें और ${farmer.crop.split('(')[0]} की जड़ों के पास जल निकासी सुनिश्चित करें।`
+      : w.humidity > 75
+        ? `🍄 नमी ${w.humidity}% है – फफूंद जोखिम उच्च है। <strong>मैन्कोज़ेब</strong> या <strong>नीम तेल</strong> का तुरंत छिड़काव करें।`
+        : w.temp > 35
+          ? `🌡️ ${cityDisplay} में तापमान ${w.temp}°C है। सुबह 7 बजे से पहले सिंचाई करें, दोपहर में खेत में न जाएं।`
+          : `✅ ${cityDisplay} में मौसम अनुकूल है (${w.temp}°C, ${w.humidity}% नमी)। ${farmer.crop.split('(')[0]} की नियमित देखभाल जारी रखें।`
+    : `मौसम विश्लेषण के अनुसार, अगले 48 घंटों में वर्षा संभव है। <strong>सिंचाई बंद रखें</strong> और खेत में जल निकासी की व्यवस्था सुनिश्चित करें।`;
+
+  const forecastRows = w
+    ? w.forecast.map(f => `<div class="forecast-day"><p>${f.day}</p><div class="icon">${f.icon}</div><div class="temp">${f.high}°</div><div class="rain">${f.rain}%🌧</div></div>`).join('')
+    : [['आज','⛅',30,22,20],['कल','🌧️',26,20,75],['परसों','🌦️',27,21,55],['शुक्र','☀️',32,23,5],['शनि','☀️',33,24,0]]
+        .map(([d,i,h,l,r]) => `<div class="forecast-day"><p>${d}</p><div class="icon">${i}</div><div class="temp">${h}°</div><div class="rain">${r}%🌧</div></div>`).join('');
+
+  const apiKeyMissing = !OWM_KEY || OWM_KEY === 'YOUR_OPENWEATHERMAP_KEY_HERE';
+
+  return `
+    <div id="alert-banner" class="alert-banner" style="background:${MARQUEE[0].bg};color:${MARQUEE[0].color}">
+      <span>${MARQUEE[0].icon}</span><span>${MARQUEE[0].text}</span><span style="margin-left:auto;font-size:11px;opacity:0.7">1/${MARQUEE.length}</span>
+    </div>
+
+    ${apiKeyMissing ? `<div class="api-notice">
+      ⚠️ <strong>Real-time weather के लिए:</strong> <a href="https://openweathermap.org/api" target="_blank">openweathermap.org</a> पर Free API key लें और HTML में <code>YOUR_OPENWEATHERMAP_KEY_HERE</code> बदलें। अभी Mock data दिख रहा है।
+    </div>` : ''}
+
+    <div class="card">
+      <div class="profile-card">
+        <div class="avatar">👨‍🌾</div>
+        <div>
+          <div class="profile-name">${farmer.name}</div>
+          <div class="profile-loc">📍 ${farmer.location}</div>
+        </div>
+        <button class="edit-btn" onclick="showEditModal()">संपादित करें</button>
+      </div>
+      <div class="profile-stats">
+        <div class="stat-box" style="background:#f0fdf4"><span class="stat-icon">🌾</span><div class="stat-label">फसल</div><div class="stat-val">${farmer.crop.split('(')[0]}</div></div>
+        <div class="stat-box" style="background:#eff6ff"><span class="stat-icon">📐</span><div class="stat-label">क्षेत्र</div><div class="stat-val">${farmer.area} एकड़</div></div>
+        <div class="stat-box" style="background:#fefce8"><span class="stat-icon">📅</span><div class="stat-label">अनुभव</div><div class="stat-val">${farmer.experience} वर्ष</div></div>
+      </div>
+    </div>
+
+    <!-- LIVE WEATHER CARD -->
+    <div class="card card-green">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <p style="color:#86efac;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">📍 ${cityDisplay}</p>
+        <span style="background:rgba(255,255,255,0.15);border-radius:99px;padding:3px 10px;font-size:10px;color:#bbf7d0">${w?.isLive ? '🟢 Live' : '🟡 Mock'} · ${updatedDisplay}</span>
+      </div>
+      <div class="weather-main">
+        <div>
+          <div class="weather-temp">${tempDisplay} ${iconDisplay}</div>
+          <p style="color:#86efac;margin-top:4px">${condDisplay}</p>
+          <p style="color:rgba(255,255,255,0.5);font-size:11px;margin-top:2px">feels like ${w ? w.feelsLike : 30}°C</p>
+        </div>
+        <div class="weather-info">
+          <div class="weather-label">आर्द्रता</div><div class="weather-val">${humDisplay}</div>
+          <div class="weather-label" style="margin-top:8px">हवा</div><div class="weather-val">${windDisplay}</div>
+          <div class="weather-label" style="margin-top:8px">बारिश</div><div class="weather-val" style="color:#93c5fd">${rainDisplay}</div>
+        </div>
+      </div>
+      <div class="risk-box">
+        <span>${risk.icon}</span>
+        <span style="color:white;font-weight:700">फफूंद जोखिम: ${risk.level}</span>
+        <span style="color:rgba(255,255,255,0.5);font-size:11px;margin-left:auto">नमी+तापमान विश्लेषण</span>
+      </div>
+      <div class="forecast">${forecastRows}</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🔔 स्मार्ट अलर्ट ${w?.isLive ? '(Live)' : ''}</div>
+      ${dynamicAlerts.map(a => `<div class="alert-item" style="border-color:${a.color};background:${a.bg}">
+        <span class="alert-icon">${a.icon}</span>
+        <div><div class="alert-title" style="color:${a.color}">${a.title}</div><div class="alert-desc">${a.desc}</div></div>
+      </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <div class="section-title">🌱 फसल स्थिति – ${farmer.crop.split('(')[0]}</div>
+      ${[
+        {label:'विकास चरण',val:'फूल आना',pct:65,color:'#10b981'},
+        {label:'मिट्टी नमी',val:w ? w.humidity+'%' : '72%',pct:w ? w.humidity : 72,color:'#3b82f6'},
+        {label:'पोषण स्तर',val:'अच्छा',pct:80,color:'#8b5cf6'},
+      ].map(r => `<div class="progress-row">
+        <div class="progress-header"><span class="progress-label">${r.label}</span><span class="progress-val">${r.val}</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${r.pct}%;background:${r.color}"></div></div>
+      </div>`).join('')}
+    </div>
+
+    <div class="tip-banner">
+      <div class="tip-title">💡 AI सुझाव (${w?.isLive ? 'Live मौसम पर' : 'सामान्य'})</div>
+      <div class="tip-text">${aiTip}</div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)hideEditModal()">
+      <div class="modal">
+        <div class="modal-title">प्रोफ़ाइल संपादित करें</div>
+        <div class="form-group"><label class="form-label">नाम</label><input class="form-input" id="edit-name" value="${farmer.name}"></div>
+        <div class="form-group"><label class="form-label">स्थान (हिंदी में)</label><input class="form-input" id="edit-loc" value="${farmer.location}"></div>
+        <div class="form-group">
+          <label class="form-label">🌦️ मौसम City (English – जैसे: Lucknow, Delhi, Mumbai)</label>
+          <input class="form-input" id="edit-city" value="${farmer.weatherCity}" placeholder="e.g. Lucknow">
+          <small style="color:#9ca3af;font-size:11px;margin-top:4px;display:block">यह city openweathermap से real-time weather के लिए है</small>
+        </div>
+        <div class="form-group"><label class="form-label">क्षेत्र (एकड़)</label><input class="form-input" type="number" id="edit-area" value="${farmer.area}"></div>
+        <div class="form-group"><label class="form-label">अनुभव (वर्ष)</label><input class="form-input" type="number" id="edit-exp" value="${farmer.experience}"></div>
+        <div class="form-group"><label class="form-label">फसल</label>
+          <select class="form-input" id="edit-crop">${CROPS.map(c=>`<option ${c===farmer.crop?'selected':''}>${c}</option>`).join('')}</select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-sm" onclick="hideEditModal()" style="background:#f3f4f6;color:#6b7280">रद्द</button>
+          <button class="btn-sm" onclick="saveProfile()" style="background:#16a34a;color:white">सहेजें + मौसम अपडेट करें</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function showEditModal() { document.getElementById('edit-modal').style.display = 'flex'; }
+function hideEditModal() { document.getElementById('edit-modal').style.display = 'none'; }
+
+function saveProfile() {
+  const newCity = document.getElementById('edit-city').value.trim();
+  farmer.name = document.getElementById('edit-name').value;
+  farmer.location = document.getElementById('edit-loc').value;
+  farmer.weatherCity = newCity || farmer.weatherCity;
+  farmer.area = parseFloat(document.getElementById('edit-area').value);
+  farmer.experience = parseInt(document.getElementById('edit-exp').value);
+  farmer.crop = document.getElementById('edit-crop').value;
+  hideEditModal();
+  weatherData = null;  // clear old data
+  render();            // show loading state
+  fetchWeather(farmer.weatherCity).then(() => render()); // fetch new city weather and re-render
+}
+
+function startAlertRotation() {
+  clearInterval(window._alertTimer);
+  window._alertTimer = setInterval(() => {
+    alertIdx = (alertIdx + 1) % MARQUEE.length;
+    const el = document.getElementById('alert-banner');
+    if (!el) return;
+    const a = MARQUEE[alertIdx];
+    el.style.background = a.bg; el.style.color = a.color;
+    el.innerHTML = `<span>${a.icon}</span><span>${a.text}</span><span style="margin-left:auto;font-size:11px;opacity:0.7">${alertIdx+1}/${MARQUEE.length}</span>`;
+  }, 3500);
+}
+
+// ─── CHAT ─────────────────────────────────────────────────────────────────────
+function renderChat() {
+  const w = weatherData;
+  const msgs = chatHistory.length ? chatHistory.map(m => `
+    <div class="msg ${m.role}">
+      ${m.role==='bot'?'<div class="msg-avatar">🤖</div>':''}
+      <div class="msg-bubble">${m.text}</div>
+    </div>`).join('') : `<div class="msg bot">
+    <div class="msg-avatar">🤖</div>
+    <div class="msg-bubble">नमस्ते ${farmer.name} जी! 🙏 मैं KrishiMitra हूं। आपकी ${farmer.crop.split('(')[0]} फसल और ${farmer.weatherCity} के ${w ? 'Live ' : ''}मौसम (${w ? w.temp+'°C' : '—'}) के बारे में पूछें।</div>
+  </div>`;
+
+  return `
+    <div class="chat-wrap">
+      <div class="chat-messages" id="chat-messages">${msgs}</div>
+      <div class="suggestions" id="suggestions">
+        ${SUGGESTIONS.map(s=>`<button class="suggest-btn" onclick="sendSuggestion(this)">${s}</button>`).join('')}
+      </div>
+      <div class="chat-input-row">
+        <button class="voice-btn" id="voice-btn" onclick="toggleVoice()" title="वॉइस इनपुट">🎤</button>
+        <input class="chat-input" id="chat-input" placeholder="अपना सवाल यहाँ लिखें..." onkeydown="if(event.key==='Enter')sendChat()"/>
+        <button class="send-btn" onclick="sendChat()">➤</button>
+      </div>
+    </div>`;
+}
+
+function initChat() { document.getElementById('chat-messages').scrollTop = 9999; }
+
+function sendSuggestion(btn) {
+  document.getElementById('chat-input').value = btn.textContent;
+  sendChat();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  const w = weatherData;
+  chatHistory.push({ role:'user', text });
+  addMsg('user', text);
+  addTyping();
+
+  const SYSTEM = `You are KrishiMitra, expert AI farming assistant for Indian farmers. 
+Farmer: ${farmer.name}, Location: ${farmer.location} (${farmer.weatherCity}), Crop: ${farmer.crop}, Area: ${farmer.area} acres, Experience: ${farmer.experience} years.
+${w ? `LIVE Weather in ${farmer.weatherCity}: ${w.temp}°C (feels like ${w.feelsLike}°C), Humidity: ${w.humidity}%, Wind: ${w.wind} km/h, Rain chance: ${w.rainChance}%, Condition: ${w.condition}.` : 'Weather: 28°C, 74% humidity.'}
+ALWAYS respond in Hindi (3-5 sentences, practical, emoji at end). Mention farmer's city and actual weather in response.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:800,
+        system: SYSTEM,
+        messages: chatHistory.map(m => ({role: m.role==='user'?'user':'assistant', content: m.text})) })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'माफ करें, कुछ समस्या हुई।';
+    removeTyping();
+    chatHistory.push({ role:'bot', text: reply });
+    addMsg('bot', reply);
+  } catch(e) {
+    removeTyping();
+    const fallback = w
+      ? `${farmer.weatherCity} में अभी ${w.temp}°C तापमान और ${w.humidity}% नमी है। ${w.rainChance > 50 ? 'बारिश की संभावना है – सिंचाई बंद रखें।' : 'मौसम अनुकूल है – नियमित देखभाल जारी रखें।'} 🌾`
+      : `${farmer.location} में मौसम के अनुसार ${farmer.crop.split('(')[0]} की नियमित देखभाल करें। 🌾`;
+    chatHistory.push({ role:'bot', text: fallback });
+    addMsg('bot', fallback);
+  }
+}
+
+function addMsg(role, text) {
+  const el = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = (role==='bot'?'<div class="msg-avatar">🤖</div>':'') + `<div class="msg-bubble">${text}</div>`;
+  el.appendChild(div); el.scrollTop = el.scrollHeight;
+}
+function addTyping() {
+  const el = document.getElementById('chat-messages');
+  const div = document.createElement('div'); div.id='typing'; div.className='msg bot';
+  div.innerHTML='<div class="msg-avatar">🤖</div><div class="msg-bubble" style="padding:14px 16px"><div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+  el.appendChild(div); el.scrollTop = el.scrollHeight;
+}
+function removeTyping() { const t=document.getElementById('typing'); if(t)t.remove(); }
+
+let recognition=null, listening=false;
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)) { alert('आपका ब्राउज़र वॉइस को सपोर्ट नहीं करता'); return; }
+  if (listening) { recognition?.stop(); return; }
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition = new SR(); recognition.lang='hi-IN'; recognition.continuous=false;
+  recognition.onstart = () => { listening=true; document.getElementById('voice-btn').classList.add('listening'); document.getElementById('voice-btn').textContent='⏹'; };
+  recognition.onend = () => { listening=false; const b=document.getElementById('voice-btn'); if(b){b.classList.remove('listening');b.textContent='🎤';} };
+  recognition.onresult = e => { document.getElementById('chat-input').value = e.results[0][0].transcript; };
+  recognition.start();
+}
+
+// ─── DISEASE ──────────────────────────────────────────────────────────────────
+let diseaseImg = null;
+function renderDisease() {
+  return `
+    <div class="card">
+      <div class="section-title">📸 फसल रोग पहचान</div>
+      <p style="font-size:12px;color:#6b7280;margin-bottom:12px">अपनी फसल की पत्ती या तने की फोटो अपलोड करें</p>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+        <div id="upload-content">
+          <div style="font-size:48px;margin-bottom:8px">📷</div>
+          <p style="font-weight:600;color:#374151">फोटो खींचें या चुनें</p>
+          <p style="font-size:12px;color:#9ca3af;margin-top:4px">JPG, PNG – अधिकतम 10MB</p>
+        </div>
+      </div>
+      <input type="file" id="file-input" accept="image/*" style="display:none" onchange="previewImage(event)"/>
+      <div id="upload-actions" style="display:none" class="upload-actions">
+        <button class="btn btn-outline" onclick="clearImage()">हटाएं</button>
+        <button class="btn btn-primary" id="analyze-btn" onclick="analyzeImage()">🔍 जांच करें</button>
+      </div>
+    </div>
+    <div id="disease-result"></div>
+    <div class="card" id="sample-box">
+      <p style="font-weight:600;color:#374151;margin-bottom:10px;font-size:13px">📋 उदाहरण रोग</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${[['पर्ण कुंचन','🍃','#fef3c7'],['झुलसा रोग','🍂','#fee2e2'],['कीट नुकसान','🐛','#f0fdf4'],['पीला रोग','🌿','#fefce8']].map(([n,e,c])=>`
+        <div style="background:${c};border-radius:14px;padding:16px;text-align:center">
+          <div style="font-size:32px">${e}</div><div style="font-size:12px;font-weight:600;margin-top:4px;color:#374151">${n}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+function initDisease() {
+  const zone = document.getElementById('upload-zone');
+  zone.ondragover = e => { e.preventDefault(); zone.style.borderColor='#16a34a'; };
+  zone.ondrop = e => { e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) handleFile(f); };
+}
+function previewImage(e) { handleFile(e.target.files[0]); }
+function handleFile(file) {
+  diseaseImg = file;
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    document.getElementById('upload-zone').classList.add('has-img');
+    document.getElementById('upload-content').innerHTML = `<img src="${reader.result}" class="upload-img"/>`;
+    document.getElementById('upload-actions').style.display = 'flex';
+    document.getElementById('sample-box').style.display = 'none';
+    document.getElementById('disease-result').innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+}
+function clearImage() {
+  diseaseImg = null;
+  document.getElementById('upload-zone').classList.remove('has-img');
+  document.getElementById('upload-content').innerHTML = '<div style="font-size:48px;margin-bottom:8px">📷</div><p style="font-weight:600;color:#374151">फोटो खींचें या चुनें</p><p style="font-size:12px;color:#9ca3af;margin-top:4px">JPG, PNG – अधिकतम 10MB</p>';
+  document.getElementById('upload-actions').style.display = 'none';
+  document.getElementById('sample-box').style.display = 'block';
+  document.getElementById('disease-result').innerHTML = '';
+  document.getElementById('file-input').value = '';
+}
+async function analyzeImage() {
+  const btn = document.getElementById('analyze-btn');
+  btn.disabled = true; btn.textContent = 'विश्लेषण हो रहा है...';
+  document.getElementById('disease-result').innerHTML = `<div class="card" style="text-align:center">
+    <div style="font-size:48px;animation:bounce 1s infinite">🔬</div>
+    <p style="font-weight:600;color:#374151;margin-top:8px">AI विश्लेषण जारी है...</p>
+  </div>`;
+  await new Promise(r => setTimeout(r, 2000));
+  btn.disabled = false; btn.textContent = '🔍 जांच करें';
+  const diseases = [
+    {name:'पर्ण कुंचन (Leaf Curl Virus)',conf:87,sev:'मध्यम',sevColor:'#f59e0b',treatment:'नीम तेल 5ml/L का छिड़काव करें, 3 दिन में दोहराएं',prev:['संक्रमित पत्तियां तोड़ें','खेत में पानी न भरने दें','स्वस्थ बीज का प्रयोग करें']},
+    {name:'भूरा धब्बा (Brown Spot)',conf:68,sev:'हल्का',sevColor:'#10b981',treatment:'मैन्कोज़ेब 2g/L पानी में मिलाकर छिड़काव करें',prev:[]},
+  ];
+  document.getElementById('disease-result').innerHTML = `
+    <div class="card" style="background:#fffbeb;border:1px solid #fcd34d">
+      <p style="font-weight:700;color:#92400e">⚠️ समग्र स्थिति: मध्यम जोखिम</p>
+      <p style="font-size:13px;color:#b45309;margin-top:6px">${farmer.crop.split('(')[0]} की फसल में पर्ण कुंचन रोग के लक्षण दिख रहे हैं।</p>
+    </div>
+    ${diseases.map(d=>`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <p style="font-weight:700;color:#1f2937;font-size:14px">${d.name}</p>
+        <span style="background:${d.sevColor}20;color:${d.sevColor};font-size:11px;padding:3px 10px;border-radius:99px;font-weight:700">${d.sev}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:4px"><span>आत्मविश्वास</span><span>${d.conf}%</span></div>
+      <div class="confidence-bar"><div style="width:${d.conf}%;background:${d.sevColor};height:100%;border-radius:99px"></div></div>
+      <div class="treatment-box"><div class="treatment-label">💊 उपचार:</div><div class="treatment-text">${d.treatment}</div></div>
+    </div>`).join('')}
+    <div class="card">
+      <p style="font-weight:700;color:#1f2937;margin-bottom:8px">🛡️ रोकथाम के उपाय</p>
+      ${diseases[0].prev.map(p=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0"><span style="color:#16a34a;font-weight:700">✓</span><span style="font-size:13px;color:#374151">${p}</span></div>`).join('')}
+    </div>`;
+}
+
+// ─── PROFIT ───────────────────────────────────────────────────────────────────
+let profitCropA = farmer.crop, profitCropB = 'कपास (Cotton)', profitArea = farmer.area || 2;
+function renderProfit() {
+  const cropsOpts = CROPS.map(c=>`<option ${c===profitCropA?'selected':''}>${c}</option>`).join('');
+  const cropsBOpts = CROPS.map(c=>`<option ${c===profitCropB?'selected':''}>${c}</option>`).join('');
+  return `
+    <div class="card">
+      <div class="section-title">💰 फसल लाभ तुलनाकर्ता</div>
+      <div class="select-row"><label class="select-label">फसल A</label><select id="crop-a" onchange="updateProfit()">${cropsOpts}</select></div>
+      <div class="select-row"><label class="select-label">फसल B</label><select id="crop-b" onchange="updateProfit()">${cropsBOpts}</select></div>
+      <div class="select-row">
+        <label class="select-label">क्षेत्र: <strong id="area-label">${profitArea} एकड़</strong></label>
+        <input type="range" id="area-range" min="0.5" max="10" step="0.5" value="${profitArea}" oninput="updateProfit()"/>
+        <div class="range-labels"><span>0.5 एकड़</span><span>10 एकड़</span></div>
+      </div>
+    </div>
+    <div id="profit-results"></div>`;
+}
+function initProfit() { updateProfit(); }
+function updateProfit() {
+  const aEl=document.getElementById('crop-a'), bEl=document.getElementById('crop-b'), rEl=document.getElementById('area-range');
+  if (!aEl) return;
+  profitCropA=aEl.value; profitCropB=bEl.value; profitArea=parseFloat(rEl.value);
+  document.getElementById('area-label').textContent = profitArea + ' एकड़';
+  const ha=profitArea*0.4047;
+  const a=CROP_DATA[profitCropA], b=CROP_DATA[profitCropB];
+  const calcP=d=>({cost:Math.round(d.cost*ha),rev:Math.round(d.rev*ha),profit:Math.round((d.rev-d.cost)*ha),roi:(((d.rev-d.cost)/d.cost)*100).toFixed(1)});
+  const ca=calcP(a), cb=calcP(b);
+  const aWins=ca.profit>cb.profit;
+  const cardHTML=(crop,d,c,isW)=>`
+    <div class="crop-card ${isW?'winner':'loser'}">
+      ${isW?'<div class="winner-badge">🏆 बेहतर</div>':''}
+      <div class="crop-card-name" style="color:${isW?'white':'#1f2937'}">${crop.split('(')[0]}</div>
+      ${[['लागत',fmt(c.cost)],['आय',fmt(c.rev)],['लाभ',fmt(c.profit)],['ROI',c.roi+'%']].map(([k,v])=>`
+      <div class="crop-stat"><span class="crop-key">${k}</span><span class="crop-val">${v}</span></div>`).join('')}
+      <div style="font-size:11px;margin-top:8px;color:${isW?'#bbf7d0':'#9ca3af'}">जोखिम: <strong style="color:${isW?'white':'#1f2937'}">${d.risk}</strong></div>
+    </div>`;
+  document.getElementById('profit-results').innerHTML = `
+    <div class="crop-cards">${cardHTML(profitCropA,a,ca,aWins)}${cardHTML(profitCropB,b,cb,!aWins)}</div>
+    <div class="card">
+      <div class="section-title">📊 विस्तृत तुलना</div>
+      <table class="table">
+        <tr><th>विवरण</th><th>${profitCropA.split('(')[0]}</th><th>${profitCropB.split('(')[0]}</th></tr>
+        <tr><td>सीज़न</td><td>${a.season}</td><td>${b.season}</td></tr>
+        <tr><td>उत्पादन/हे</td><td>${a.yield}</td><td>${b.yield}</td></tr>
+        <tr><td>लागत</td><td>${fmt(ca.cost)}</td><td>${fmt(cb.cost)}</td></tr>
+        <tr><td>आय</td><td>${fmt(ca.rev)}</td><td>${fmt(cb.rev)}</td></tr>
+        <tr class="bold-row"><td>कुल लाभ</td><td>${fmt(ca.profit)}</td><td>${fmt(cb.profit)}</td></tr>
+        <tr class="bold-row"><td>ROI</td><td>${ca.roi}%</td><td>${cb.roi}%</td></tr>
+        <tr><td>जोखिम</td><td>${a.risk}</td><td>${b.risk}</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <button class="btn btn-primary" id="ai-btn" onclick="getAIAnalysis()" style="margin-bottom:12px">🤖 AI से सुझाव लें</button>
+      <div id="ai-result"></div>
+    </div>
+    <div class="card">
+      <div class="section-title">🏛️ सरकारी योजनाएं</div>
+      ${[
+        {name:'PM किसान',amount:'₹6,000/वर्ष',status:'उपलब्ध',color:'#10b981'},
+        {name:'फसल बीमा',amount:'प्रीमियम: 2%',status:'पंजीकरण खुला',color:'#3b82f6'},
+        {name:'KCC ऋण',amount:'₹3 लाख तक',status:'ब्याज 4%',color:'#8b5cf6'},
+      ].map(s=>`<div class="scheme-row">
+        <div><p style="font-size:13px;font-weight:600;color:#1f2937">${s.name}</p><p style="font-size:12px;color:#6b7280">${s.amount}</p></div>
+        <span class="badge" style="background:${s.color}20;color:${s.color}">${s.status}</span>
+      </div>`).join('')}
+    </div>`;
+}
+async function getAIAnalysis() {
+  const btn=document.getElementById('ai-btn');
+  btn.disabled=true; btn.textContent='विश्लेषण जारी...';
+  const ha=profitArea*0.4047;
+  const a=CROP_DATA[profitCropA], b=CROP_DATA[profitCropB];
+  const w=weatherData;
+  const prompt=`किसान ${farmer.name}, ${farmer.location} (${farmer.weatherCity}), ${profitArea} एकड़ खेत। ${profitCropA} vs ${profitCropB} तुलना। ${profitCropA}: लागत ₹${Math.round(a.cost*ha)}, आय ₹${Math.round(a.rev*ha)}। ${profitCropB}: लागत ₹${Math.round(b.cost*ha)}, आय ₹${Math.round(b.rev*ha)}। ${w?`Live मौसम: ${w.temp}°C, ${w.humidity}% नमी।`:''} 4-5 वाक्यों में हिंदी में सुझाव दें।`;
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}],
+        system:'Agricultural expert. Always Hindi. Be practical and specific.'})});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'';
+    document.getElementById('ai-result').innerHTML=`<div style="background:#f0fdf4;border-radius:12px;padding:12px"><p style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px">🌾 KrishiMitra सुझाव:</p><p style="font-size:13px;color:#166534;line-height:1.7">${reply}</p></div>`;
+  } catch(e) {
+    document.getElementById('ai-result').innerHTML=`<div style="background:#f0fdf4;border-radius:12px;padding:12px"><p style="font-size:13px;color:#166534;line-height:1.7">🌾 ${farmer.location} के लिए ${profitCropA.split('(')[0]} अधिक उपयुक्त है।</p></div>`;
+  }
+  btn.disabled=false; btn.textContent='🤖 AI से सुझाव लें';
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+render(); // render immediately with mock/no data
+fetchWeather(farmer.weatherCity).then(() => {
+  if (currentPage === 'dashboard') render();
+});
+startWeatherRefresh(); // auto-refresh every 10 min
+</script>
+</body>
+</html>
