@@ -41,10 +41,6 @@ KrishiMitra/
 
 ## 🚀 Setup & Run Instructions
 
-### Prerequisites
-- Node.js v18+ 
-- npm v9+
-
 ### Step 1: Start Backend
 ```bash
 cd backend
