@@ -1,4 +1,4 @@
-# 🌾 KrishiMitra AI – Predictive Farming Intelligence System
+# 🌾 KrishiMitra AI – Predictive Farming Intelligence System      https://manushka01.github.io/KrishiMitra-/
 ### Major Final Year Project
 
 ---
